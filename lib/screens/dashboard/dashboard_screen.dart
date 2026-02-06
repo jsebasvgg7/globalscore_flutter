@@ -3,6 +3,8 @@ import 'package:provider/provider.dart';
 import '../../core/constants/app_colors.dart';
 import '../../providers/auth_provider.dart';
 import '../../providers/matches_provider.dart';
+import '../../models/match_model.dart';
+import '../../widgets/match_card.dart';
 
 class DashboardScreen extends StatefulWidget {
   const DashboardScreen({super.key});
@@ -43,6 +45,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
     }
 
     return Scaffold(
+      backgroundColor: AppColors.background,
       appBar: AppBar(
         title: const Text('GlobalScore'),
         actions: [
@@ -340,92 +343,33 @@ class _DashboardScreenState extends State<DashboardScreen> {
         padding: const EdgeInsets.all(20),
         itemCount: matches.length,
         itemBuilder: (context, index) {
-          final match = matches[index];
+          final matchData = matches[index];
+          final match = MatchModel.fromJson(matchData);
           
-          return Container(
-            margin: const EdgeInsets.only(bottom: 16),
-            padding: const EdgeInsets.all(20),
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(color: AppColors.gray200),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.06),
-                  blurRadius: 12,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                // Header: Liga y Fecha
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      match['league'] ?? 'Liga',
-                      style: const TextStyle(
-                        fontSize: 14,
-                        fontWeight: FontWeight.w600,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                    Text(
-                      match['date'] ?? '',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                
-                // Equipos
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        match['home_team'] ?? '',
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                    const Text(
-                      'vs',
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: AppColors.gray400,
-                      ),
-                    ),
-                    Expanded(
-                      child: Text(
-                        match['away_team'] ?? '',
-                        textAlign: TextAlign.right,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.w700,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                
-                // Inputs de predicción
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    // TODO: Implementar inputs de predicción
-                    const Text('TODO: Inputs de predicción'),
-                  ],
-                ),
-              ],
-            ),
+          // Buscar predicción del usuario para este partido
+          final predictions = matchData['predictions'] as List<dynamic>? ?? [];
+          final userPredData = predictions.firstWhere(
+            (p) => p['user_id'] == userId,
+            orElse: () => null,
+          );
+          
+          final userPrediction = userPredData != null 
+              ? PredictionModel.fromJson(userPredData as Map<String, dynamic>)
+              : null;
+
+          return MatchCard(
+            match: match,
+            userPrediction: userPrediction,
+            onPredict: (matchId, homeScore, awayScore, advancingTeam) async {
+              final authProvider = context.read<AuthProvider>();
+              await matchesProvider.makePrediction(
+                currentUser: authProvider.currentUser!,
+                matchId: matchId,
+                homeScore: homeScore,
+                awayScore: awayScore,
+                advancingTeam: advancingTeam,
+              );
+            },
           );
         },
       );
@@ -453,9 +397,22 @@ class _DashboardScreenState extends State<DashboardScreen> {
       backgroundColor: AppColors.purple,
       selectedItemColor: Colors.white,
       unselectedItemColor: Colors.white70,
-      currentIndex: 0,
+      currentIndex: 2, // Inicio
       onTap: (index) {
         // TODO: Implementar navegación
+        if (index == 2) return; // Ya estamos en inicio
+        
+        switch (index) {
+          case 0:
+            // TODO: Navegar a perfil
+            break;
+          case 1:
+            // TODO: Navegar a ranking
+            break;
+          case 3:
+            // TODO: Navegar a stats
+            break;
+        }
       },
       items: const [
         BottomNavigationBarItem(
