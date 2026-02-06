@@ -4,6 +4,7 @@ import '../../providers/auth_provider.dart';
 import '../../core/constants/app_colors.dart';
 import 'register_screen.dart';
 import 'forgot_password_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -37,9 +38,8 @@ class _LoginScreenState extends State<LoginScreen> {
     if (!mounted) return;
 
     if (success) {
-      // TODO: Navegar a Dashboard (próxima fase)
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const Placeholder()),
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

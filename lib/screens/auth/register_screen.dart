@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/constants/app_colors.dart';
 import 'login_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -58,9 +59,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
       
       if (!mounted) return;
       
-      // TODO: Navegar a Dashboard (próxima fase)
       Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const Placeholder()),
+        MaterialPageRoute(builder: (_) => const DashboardScreen()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

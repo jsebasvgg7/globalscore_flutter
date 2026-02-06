@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../providers/auth_provider.dart';
 import '../../core/constants/app_colors.dart';
 import 'login_screen.dart';
+import '../dashboard/dashboard_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -45,12 +46,9 @@ class _SplashScreenState extends State<SplashScreen> {
     // Navegar según estado de autenticación
     if (authProvider.isAuthenticated && authProvider.currentUser != null) {
       print('✅ Usuario autenticado: ${authProvider.currentUser!.name}');
-      // TODO: Navegar a Dashboard (próxima fase)
       Navigator.of(context).pushReplacement(
         MaterialPageRoute(
-          builder: (_) => DashboardPlaceholder(
-            userName: authProvider.currentUser!.name,
-          ),
+          builder: (_) => const DashboardScreen(),
         ),
       );
     } else {
@@ -151,166 +149,6 @@ class _SplashScreenState extends State<SplashScreen> {
           ],
         ),
       ),
-    );
-  }
-}
-
-// Placeholder temporal para el dashboard
-class DashboardPlaceholder extends StatelessWidget {
-  final String userName;
-  
-  const DashboardPlaceholder({
-    super.key,
-    required this.userName,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    final authProvider = context.watch<AuthProvider>();
-    
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('GlobalScore'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () async {
-              await authProvider.signOut();
-              if (!context.mounted) return;
-              Navigator.of(context).pushReplacement(
-                MaterialPageRoute(builder: (_) => const LoginScreen()),
-              );
-            },
-          ),
-        ],
-      ),
-      body: Center(
-        child: Padding(
-          padding: const EdgeInsets.all(24),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Icon(
-                Icons.sports_soccer,
-                size: 100,
-                color: AppColors.purple,
-              ),
-              const SizedBox(height: 24),
-              Text(
-                '¡Bienvenido, $userName!',
-                style: Theme.of(context).textTheme.headlineMedium,
-                textAlign: TextAlign.center,
-              ),
-              const SizedBox(height: 16),
-              Text(
-                'Tu sesión está activa',
-                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
-              ),
-              const SizedBox(height: 48),
-              
-              // Stats Card
-              Container(
-                padding: const EdgeInsets.all(24),
-                decoration: BoxDecoration(
-                  color: AppColors.purple.withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(16),
-                  border: Border.all(
-                    color: AppColors.purple.withOpacity(0.3),
-                    width: 2,
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _StatItem(
-                          label: 'Puntos',
-                          value: '${authProvider.currentUser?.points ?? 0}',
-                          icon: Icons.star,
-                        ),
-                        _StatItem(
-                          label: 'Nivel',
-                          value: '${authProvider.currentUser?.level ?? 1}',
-                          icon: Icons.trending_up,
-                        ),
-                        _StatItem(
-                          label: 'Racha',
-                          value: '${authProvider.currentUser?.currentStreak ?? 0}',
-                          icon: Icons.local_fire_department,
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 16),
-                    const Divider(),
-                    const SizedBox(height: 16),
-                    Text(
-                      'Predicciones: ${authProvider.currentUser?.predictions ?? 0}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                    Text(
-                      'Correctas: ${authProvider.currentUser?.correct ?? 0}',
-                      style: Theme.of(context).textTheme.bodyMedium,
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 32),
-              
-              const Text(
-                '🚧 Dashboard en construcción 🚧',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.textSecondary,
-                  fontWeight: FontWeight.w500,
-                ),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-class _StatItem extends StatelessWidget {
-  final String label;
-  final String value;
-  final IconData icon;
-
-  const _StatItem({
-    required this.label,
-    required this.value,
-    required this.icon,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Icon(
-          icon,
-          color: AppColors.purple,
-          size: 32,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          value,
-          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-            color: AppColors.purple,
-          ),
-        ),
-        const SizedBox(height: 4),
-        Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: AppColors.textSecondary,
-          ),
-        ),
-      ],
     );
   }
 }
